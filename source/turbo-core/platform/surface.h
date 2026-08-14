@@ -7,6 +7,7 @@
 #include <tvision/tv.h>
 
 #include <turbo/scintilla/internals.h>
+#include <type_traits>
 
 class TDrawSurface;
 
@@ -84,10 +85,13 @@ namespace Scintilla {
         return r;
     }
 
-    inline TColorDesired convertColor(ColourDesired color)
+    inline TColor convertColor(ColourDesired color)
     {
-        TColorDesired c;
-        c.bitCast(color.AsInteger());
+        static_assert(sizeof(TColor) == sizeof(uint32_t), "");
+        static_assert(std::is_trivially_copyable<TColor>(), "");
+        uint32_t value = color.AsInteger();
+        TColor c;
+        memcpy((void *) &c, &value, 4);
         return c;
     }
 
@@ -96,9 +100,13 @@ namespace Scintilla {
         return {convertColor(fore), convertColor(back)};
     }
 
-    inline ColourDesired convertColor(TColorDesired c)
+    inline ColourDesired convertColor(TColor c)
     {
-        return ColourDesired(c.bitCast());
+        static_assert(sizeof(TColor) == sizeof(uint32_t), "");
+        static_assert(std::is_trivially_copyable<TColor>(), "");
+        uint32_t value;
+        memcpy(&value, (void *) &c, 4);
+        return ColourDesired(value);
     }
 
     inline ushort getStyle(const Font &font)

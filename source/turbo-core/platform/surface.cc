@@ -79,7 +79,7 @@ void TScintillaSurface::FillRectangle(PRectangle rc, ColourDesired back)
         // also needs to be set or else the cursor will have the wrong color when
         // placed on this area.
         auto attr = defaultTextAttr;
-        ::setBack(attr, convertColor(back));
+        attr.setBackground(convertColor(back));
         auto *cells = &surface->at(r.a.y, r.a.x);
         size_t count = r.b.x - r.a.x;
         for (int y = r.a.y; y < r.b.y; ++y)
@@ -115,9 +115,9 @@ void TScintillaSurface::AlphaRectangle( PRectangle rc, int cornerSize, ColourDes
             for (size_t x = 0; x < count; ++x)
             {
                 if (!fg.isDefault())
-                    ::setFore(cells[x].attr, fg);
+                    cells[x].attribute.setForeground(fg);
                 if (!bg.isDefault())
-                    ::setBack(cells[x].attr, bg);
+                    cells[x].attribute.setBackground(bg);
             }
             cells += surface->size.x;
         }
@@ -167,7 +167,7 @@ void TScintillaSurface::DrawTextClipped( PRectangle rc, Font &font_,
                  && 0 <= r.a.y && r.a.y < r.b.y )
     {
         auto attr = convertColorPair(fore, back);
-        ::setStyle(attr, getStyle(font_));
+        attr.setStyle(getStyle(font_));
         auto *cells = &surface->at(r.a.y, r.a.x);
         size_t count = r.b.x - r.a.x;
         int indent = clip.a.x - (int) rc.left;
@@ -193,8 +193,8 @@ void TScintillaSurface::DrawTextTransparent(PRectangle rc, Font &font_, XYPOSITI
         for (int y = r.a.y; y < r.b.y; ++y)
         {
             TText::drawStrEx({cells, count}, 0, text, indent, [&] (auto &attr) {
-                ::setFore(attr, fg);
-                ::setStyle(attr, style);
+                attr.setForeground(fg);
+                attr.setStyle(style);
             });
             cells += surface->size.x;
         }

@@ -1064,12 +1064,12 @@ constexpr struct { const Language *language; LexerSettings lexer; } builtInLexer
 
 TColorAttr coalesce(TColorAttr from, TColorAttr into)
 {
-    auto f_fg = ::getFore(from), f_bg = ::getBack(from),
-         i_fg = ::getFore(into), i_bg = ::getBack(into);
+    auto f_fg = from.getForeground(), f_bg = from.getBackground(),
+         i_fg = into.getForeground(), i_bg = into.getBackground();
     return {
         f_fg.isDefault() ? i_fg : f_fg,
         f_bg.isDefault() ? i_bg : f_bg,
-        ::getStyle(from),
+        from.getStyle(),
     };
 }
 

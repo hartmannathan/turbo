@@ -212,16 +212,16 @@ void paint(TScintilla &self, TDrawSurface &d, TRect area)
 void setStyleColor(TScintilla &self, int style, TColorAttr attr)
 {
     using namespace Scintilla;
-    call(self, SCI_STYLESETFORE, style, convertColor(::getFore(attr)).AsInteger());
-    call(self, SCI_STYLESETBACK, style, convertColor(::getBack(attr)).AsInteger());
-    call(self, SCI_STYLESETWEIGHT, style, ::getStyle(attr));
+    call(self, SCI_STYLESETFORE, style, convertColor(attr.getForeground()).AsInteger());
+    call(self, SCI_STYLESETBACK, style, convertColor(attr.getBackground()).AsInteger());
+    call(self, SCI_STYLESETWEIGHT, style, attr.getStyle());
 }
 
 void setSelectionColor(TScintilla &self, TColorAttr attr)
 {
     using namespace Scintilla;
-    auto fg = ::getFore(attr),
-         bg = ::getBack(attr);
+    auto fg = attr.getForeground(),
+         bg = attr.getBackground();
     call(self, SCI_SETSELFORE, !fg.isDefault(), convertColor(fg).AsInteger());
     call(self, SCI_SETSELBACK, !bg.isDefault(), convertColor(bg).AsInteger());
 }
@@ -229,8 +229,8 @@ void setSelectionColor(TScintilla &self, TColorAttr attr)
 void setWhitespaceColor(TScintilla &self, TColorAttr attr)
 {
     using namespace Scintilla;
-    auto fg = ::getFore(attr),
-         bg = ::getBack(attr);
+    auto fg = attr.getForeground(),
+         bg = attr.getBackground();
     call(self, SCI_SETWHITESPACEFORE, !fg.isDefault(), convertColor(fg).AsInteger());
     call(self, SCI_SETWHITESPACEBACK, !bg.isDefault(), convertColor(bg).AsInteger());
 }
@@ -254,8 +254,8 @@ void changeCaseOfSelection(TScintilla &self, CaseConversion cnv)
 void setIndicatorColor(TScintilla &self, Indicator indicator, TColorAttr attr)
 {
     using namespace Scintilla;
-    auto fg = ::getFore(attr),
-         bg = ::getBack(attr);
+    auto fg = attr.getForeground(),
+         bg = attr.getBackground();
     call(self, SCI_INDICSETSTYLE, indicator, INDIC_FULLBOX);
     call(self, SCI_INDICSETFORE, indicator, convertColor(bg).AsInteger());
     call(self, SCI_INDICSETOUTLINEALPHA, indicator, convertColor(fg).AsInteger());
