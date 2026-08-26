@@ -4,12 +4,14 @@
 #include <tvision/tv.h>
 
 #include <turbo/editor.h>
+#include <turbo/cmds.h>
 #include "icmds.h"
 
 namespace turbo {
 
-EditorView::EditorView(const TRect &bounds) noexcept :
-    TSurfaceView(bounds)
+EditorView::EditorView(const TRect &bounds, const TurboCommands &aCommands) noexcept :
+    TSurfaceView(bounds),
+    cmds(aCommands)
 {
     growMode = gfGrowHiX | gfGrowHiY;
     options |= ofSelectable | ofFirstClick;
@@ -203,6 +205,12 @@ void EditorView::updateCommands()
     setCmdState(cmCut, hasSelection);
     setCmdState(cmCopy, hasSelection);
     setCmdState(cmPaste, editor != nullptr);
+    if (cmds.cmSelUppercase)
+        setCmdState(cmds.cmSelUppercase, hasSelection);
+    if (cmds.cmSelLowercase)
+        setCmdState(cmds.cmSelLowercase, hasSelection);
+    if (cmds.cmSelCapitalize)
+        setCmdState(cmds.cmSelCapitalize, hasSelection);
 }
 
 } // namespace turbo

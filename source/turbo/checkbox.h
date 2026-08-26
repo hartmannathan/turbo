@@ -5,7 +5,7 @@
 #define Uses_TCheckBoxes
 #include <tvision/tv.h>
 
-#include "cmds.h"
+#include "appcmds.h"
 
 class CheckBox : public TCheckBoxes
 {

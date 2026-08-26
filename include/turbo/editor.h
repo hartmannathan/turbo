@@ -17,6 +17,7 @@ namespace turbo {
 class EditorView;
 class LeftMarginView;
 class Editor;
+struct TurboCommands;
 
 struct EditorParent
 {
@@ -174,18 +175,21 @@ class EditorView : public TSurfaceView
     // scrollbars...).
     //
     // It handles and enables the following commands:
-    // cmCut, cmCopy, cmPaste.
+    // cmCut, cmCopy, cmPaste, cmSelUppercase, cmSelLowercase, cmSelCapitalize.
 public:
 
     Editor *editor {nullptr}; // Non-owning.
 
-    EditorView(const TRect &bounds) noexcept;
+    // The lifetime of 'cmds' must exceed that of 'this'.
+    EditorView(const TRect &bounds, const TurboCommands &cmds) noexcept;
 
     void handleEvent(TEvent &ev) override;
     void draw() override;
     void setState(ushort command, bool enable) override;
 
 private:
+
+    const TurboCommands &cmds;
 
     void handlePaste(TEvent &ev);
     bool canUpdateCommands();

@@ -14,7 +14,7 @@ TFrame* BasicEditorWindow::initFrame(TRect bounds)
     return new BasicEditorFrame(bounds);
 }
 
-BasicEditorWindow::BasicEditorWindow(const TRect &bounds, Editor &aEditor) :
+BasicEditorWindow::BasicEditorWindow(const TRect &bounds, Editor &aEditor, const TurboCommands &cmds) :
     TWindowInit(&initFrame),
     TWindow(bounds, nullptr, wnNoNumber),
     editor(aEditor)
@@ -22,7 +22,7 @@ BasicEditorWindow::BasicEditorWindow(const TRect &bounds, Editor &aEditor) :
     options |= ofTileable | ofFirstClick;
     setState(sfShadow, False);
 
-    auto *editorView = new EditorView(TRect(1, 1, size.x - 1, size.y - 1));
+    auto *editorView = new EditorView(TRect(1, 1, size.x - 1, size.y - 1), cmds);
     insert(editorView);
 
     auto *leftMargin = new LeftMarginView(leftMarginSep);

@@ -6,7 +6,7 @@
 #define Uses_TRangeValidator
 #include <tvision/tv.h>
 
-#include "cmds.h"
+#include "appcmds.h"
 
 namespace turbo
 {

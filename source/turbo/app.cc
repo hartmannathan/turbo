@@ -26,8 +26,16 @@
 #include "doctree.h"
 #include <turbo/fileeditor.h>
 #include <turbo/tpath.h>
+#include <turbo/cmds.h>
 
 using namespace Scintilla;
+
+const turbo::TurboCommands TurboApp::cmds =
+{
+    cmSelUppercase,
+    cmSelLowercase,
+    cmSelCapitalize,
+};
 
 TurboApp::TurboApp(int argc, const char *argv[]) noexcept :
     TProgInit( &TurboApp::initStatusLine,
@@ -335,7 +343,7 @@ void TurboApp::addEditor(turbo::TScintilla &scintilla, const char *path)
     TRect r = newEditorBounds();
     auto &counter = fileCount[TPath::basename(path)];
     auto &editor = *new TurboEditor(scintilla, path);
-    EditorWindow &w = *new EditorWindow(r, editor, counter, searchSettings, *this);
+    EditorWindow &w = *new EditorWindow(r, editor, counter, searchSettings, *this, cmds);
     if (docTree)
         docTree->tree->addEditor(&w);
     w.listHead.insert_after(&MRUlist);

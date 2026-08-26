@@ -9,7 +9,7 @@
 #include "doctree.h"
 #include "apputils.h"
 #include "editwindow.h"
-#include "cmds.h"
+#include "appcmds.h"
 
 struct EditorWindow;
 class TClockView;
@@ -27,6 +27,8 @@ struct TurboApp : public TApplication, EditorWindowParent
     const char **argv;
     turbo::SearchSettings searchSettings;
     std::string mostRecentDir;
+
+    static const turbo::TurboCommands cmds;
 
     TurboApp(int argc, const char **argv) noexcept;
     static TMenuBar* initMenuBar(TRect r);

@@ -243,7 +243,7 @@ void ListView::draw()
 /////////////////////////////////////////////////////////////////////////
 // EditorListView
 
-#include "cmds.h"
+#include "appcmds.h"
 
 static int mod(int a, int b)
 {

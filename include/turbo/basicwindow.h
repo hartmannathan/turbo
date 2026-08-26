@@ -65,7 +65,8 @@ public:
 
     // Takes ownership over 'aEditor'.
     // Assumes 'TWindow::frame' (the result of 'initFrame') to be a 'BasicEditorFrame'.
-    BasicEditorWindow(const TRect &bounds, Editor &aEditor);
+    // The lifetime of 'cmds' must exceed that of 'this'.
+    BasicEditorWindow(const TRect &bounds, Editor &aEditor, const TurboCommands &cmds);
     ~BasicEditorWindow();
 
     void shutDown() override;

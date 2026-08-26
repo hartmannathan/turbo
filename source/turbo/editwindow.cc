@@ -19,9 +19,10 @@ using std::ios;
 EditorWindow::EditorWindow( const TRect &bounds, TurboEditor &aEditor,
                             active_counter &fileCounter,
                             turbo::SearchSettings &searchSettings,
-                            EditorWindowParent &aParent ) noexcept :
+                            EditorWindowParent &aParent,
+                            const turbo::TurboCommands &cmds ) noexcept :
     TWindowInit(&initFrame),
-    super(bounds, aEditor),
+    super(bounds, aEditor, cmds),
     listHead(this),
     fileNumber(fileCounter),
     parent(aParent),

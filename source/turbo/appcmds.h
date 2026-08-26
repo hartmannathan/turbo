@@ -1,5 +1,5 @@
-#ifndef TURBO_CMDS_H
-#define TURBO_CMDS_H
+#ifndef TURBO_APPCMDS_H
+#define TURBO_APPCMDS_H
 
 // Commands 0..255 support being disabled while the rest don't. However,
 // command ranges 0..99 and 256..999 are reserved by Turbo Vision, so custom
@@ -38,4 +38,4 @@ enum : ushort
     cmFindHelpWindow,
 };
 
-#endif // TURBO_CMDS_H
+#endif // TURBO_APPCMDS_H

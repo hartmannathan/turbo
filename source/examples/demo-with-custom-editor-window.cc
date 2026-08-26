@@ -28,6 +28,10 @@ enum : ushort
     cmCloseFile,
 };
 
+// This demo does not use any of Turbo's specific commands, so this can be
+// left empty.
+static const turbo::TurboCommands editorCmds = {};
+
 class DemoEditorListView;
 using EditorList = std::forward_list<turbo::FileEditor>;
 
@@ -157,7 +161,7 @@ auto DemoEditorWindow::makeListViewBounds(const TRect &editorViewBounds) noexcep
 
 auto DemoEditorWindow::createEditorView(const TRect &editorViewBounds) noexcept
 {
-    return new turbo::EditorView(editorViewBounds);
+    return new turbo::EditorView(editorViewBounds, editorCmds);
 }
 
 auto DemoEditorWindow::createLeftMarginView() noexcept

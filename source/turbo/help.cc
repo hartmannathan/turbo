@@ -7,7 +7,7 @@
 #define Uses_TStaticText
 #include <tvision/tv.h>
 
-#include "cmds.h"
+#include "appcmds.h"
 #include <sstream>
 
 static constexpr TStringView aboutDialogText =
@@ -125,7 +125,7 @@ InMemoryHelpFile::InMemoryHelpFile() noexcept :
 {
 }
 
-// Inherit THelpWindow to be able to handle the cmFindHelpWindow command.
+// Extend THelpWindow in order to handle the cmFindHelpWindow command.
 class TurboHelpWindow : public THelpWindow
 {
 public:

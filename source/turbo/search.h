@@ -7,7 +7,7 @@
 #include <tvision/tv.h>
 
 #include <turbo/editstates.h>
-#include "cmds.h"
+#include "appcmds.h"
 #include "apputils.h"
 
 namespace turbo

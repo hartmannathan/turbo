@@ -33,6 +33,10 @@ enum : ushort
     cmCloseFile,
 };
 
+// This demo does not use any of Turbo's specific commands, so this can be
+// left empty.
+static const turbo::TurboCommands editorCmds = {};
+
 class DemoEditorListView;
 class DemoPascalFileEditor;
 
@@ -228,7 +232,7 @@ auto DemoEditorWindow::makeListViewBounds(const TRect &editorViewBounds) noexcep
 
 auto DemoEditorWindow::createEditorView(const TRect &editorViewBounds) noexcept
 {
-    auto *editorView = new turbo::EditorView(editorViewBounds);
+    auto *editorView = new turbo::EditorView(editorViewBounds, editorCmds);
     editorView->options |= ofFramed;
     return editorView;
 }
