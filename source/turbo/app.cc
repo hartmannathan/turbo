@@ -35,6 +35,7 @@ const turbo::TurboCommands TurboApp::cmds =
     cmSelUppercase,
     cmSelLowercase,
     cmSelCapitalize,
+    cmSelSortLines,
 };
 
 TurboApp::TurboApp(int argc, const char *argv[]) noexcept :
@@ -61,6 +62,7 @@ TurboApp::TurboApp(int argc, const char *argv[]) noexcept :
     ts += cmSelUppercase;
     ts += cmSelLowercase;
     ts += cmSelCapitalize;
+    ts += cmSelSortLines;
     ts += cmToggleComment;
     ts += cmUndo;
     ts += cmRedo;
@@ -144,6 +146,8 @@ TMenuBar *TurboApp::initMenuBar(TRect r)
             *new TMenuItem( "~U~ppercase", cmSelUppercase, kbNoKey, hcNoContext ) +
             *new TMenuItem( "~L~owercase", cmSelLowercase, kbNoKey, hcNoContext ) +
             *new TMenuItem( "~C~apitalize", cmSelCapitalize, kbNoKey, hcNoContext ) +
+            newLine() +
+            *new TMenuItem( "~S~ort Lines", cmSelSortLines, kbNoKey, hcNoContext ) +
         *new TSubMenu( "~W~indows", kbAltW ) +
             *new TMenuItem( "~Z~oom", cmZoom, kbF5, hcNoContext, "F5" ) +
             *new TMenuItem( "~R~esize/move",cmResize, kbCtrlF5, hcNoContext, "Ctrl-F5" ) +

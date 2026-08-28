@@ -1145,4 +1145,173 @@ TEST(ToggleComment, ShouldInsertBatchLineComments)
     }
 }
 
+/////////////////////////////////////////////////////////////////////////
+// Sort selected lines
+
+static std::string sortSelectedLines(std::string_view input)
+{
+    return modifyScintillaAndGetTextState(input, [&] (auto &scintilla) {
+        sortSelectedLines(scintilla);
+    });
+}
+
+TEST(SortSelectedLines, ShouldDoNothingWithoutMultiLineSelection)
+{
+    static constexpr TestCase<std::string_view> testCases[] =
+    {
+        // No selection.
+        {   "ba|nana\n"
+            "apple\n",
+
+            "ba|nana\n"
+            "apple\n",
+        },
+        // Selection confined to a single line.
+        {   "^ba|nana\n"
+            "apple\n",
+
+            "^ba|nana\n"
+            "apple\n",
+        },
+    };
+
+    for (auto &testCase : testCases)
+    {
+        auto &&actual = sortSelectedLines(testCase.input);
+        expectMatchingResult(actual, testCase);
+    }
+}
+
+TEST(SortSelectedLines, ShouldSortAscending)
+{
+    static constexpr TestCase<std::string_view> testCases[] =
+    {
+        // Selection direction: anchor at the start, caret at the end.
+        {   "^b\n"
+            "a\n"
+            "c\n"
+            "|",
+
+            "^a\n"
+            "b\n"
+            "c\n"
+            "|",
+        },
+        // Selection direction: caret at the start, anchor at the end.
+        {   "|b\n"
+            "a\n"
+            "c\n"
+            "^",
+
+            "|a\n"
+            "b\n"
+            "c\n"
+            "^",
+        },
+        // Sorting is case-sensitive.
+        {   "^a\n"
+            "B\n"
+            "c\n"
+            "|",
+
+            "^B\n"
+            "a\n"
+            "c\n"
+            "|",
+        },
+        // Sorting involves line breaks as well.
+        {   "^b\n"
+            "a\r\n"
+            "a\n"
+            "|",
+
+            "^a\n"
+            "a\r\n"
+            "b\n"
+            "|",
+        },
+    };
+
+    for (auto &testCase : testCases)
+    {
+        auto &&actual = sortSelectedLines(testCase.input);
+        expectMatchingResult(actual, testCase);
+    }
+}
+
+TEST(SortSelectedLines, ShouldExtendSelectionToFullLines)
+{
+    static constexpr TestCase<std::string_view> testCases[] =
+    {
+        {   "ban^ana\n"
+            "apple\n"
+            "che|rry\n",
+
+            "^apple\n"
+            "banana\n"
+            "cherry\n"
+            "|",
+        },
+    };
+
+    for (auto &testCase : testCases)
+    {
+        auto &&actual = sortSelectedLines(testCase.input);
+        expectMatchingResult(actual, testCase);
+    }
+}
+
+TEST(SortSelectedLines, ShouldPreserveLineEndings)
+{
+    static constexpr TestCase<std::string_view> testCases[] =
+    {
+        // Line 'b' keeps its original '\r\n' terminator.
+        {   "^b\r\n"
+            "a\n"
+            "c\n"
+            "|",
+
+            "^a\n"
+            "b\r\n"
+            "c\n"
+            "|",
+        },
+    };
+
+    for (auto &testCase : testCases)
+    {
+        auto &&actual = sortSelectedLines(testCase.input);
+        expectMatchingResult(actual, testCase);
+    }
+}
+
+TEST(SortSelectedLines, ShouldHandleLastLineOfDocument)
+{
+    static constexpr TestCase<std::string_view> testCases[] =
+    {
+        {   "^cherry\n"
+            "banana\n"
+            "apple|",
+
+            "^apple\n"
+            "banana\n"
+            "cherry|",
+        },
+        {   "^banana\n"
+            "apple\n"
+            "cherry|",
+
+            "^apple\n"
+            "banana\n"
+            "cherry|",
+        },
+    };
+
+    for (auto &testCase : testCases)
+    {
+        auto &&actual = sortSelectedLines(testCase.input);
+        expectMatchingResult(actual, testCase);
+    }
+}
+
 } // namespace turbo

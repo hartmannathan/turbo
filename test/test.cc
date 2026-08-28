@@ -51,6 +51,8 @@ TScintilla &createScintilla(TextState state)
     auto &scintilla = createScintilla();
     call(scintilla, SCI_SETTEXT, 0U, (sptr_t) state.text.c_str());
     call(scintilla, SCI_SETSEL, state.anchor, state.caret);
+    // Set a fixed default line break to make tests consistent accross platforms.
+    call(scintilla, SCI_SETEOLMODE, SC_EOL_LF, 0U);
     return scintilla;
 }
 

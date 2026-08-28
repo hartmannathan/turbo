@@ -43,6 +43,7 @@ EditorWindow::EditorWindow( const TRect &bounds, TurboEditor &aEditor,
     enabledCmds += cmSelUppercase;
     enabledCmds += cmSelLowercase;
     enabledCmds += cmSelCapitalize;
+    enabledCmds += cmSelSortLines;
     enabledCmds += cmToggleComment;
     enabledCmds += cmReplaceOne;
     enabledCmds += cmReplaceAll;
@@ -115,6 +116,10 @@ void EditorWindow::handleEvent(TEvent &ev)
                     break;
                 case cmSelCapitalize:
                     editor.capitalize();
+                    editor.partialRedraw();
+                    break;
+                case cmSelSortLines:
+                    editor.sortLines();
                     editor.partialRedraw();
                     break;
                 case cmToggleComment:

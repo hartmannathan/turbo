@@ -21,6 +21,7 @@ enum : ushort
     cmSelUppercase,
     cmSelLowercase,
     cmSelCapitalize,
+    cmSelSortLines,
     cmToggleComment,
     cmGoToLine,
     cmReplaceOne,

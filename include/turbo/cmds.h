@@ -15,6 +15,7 @@ struct TurboCommands
     ushort cmSelUppercase {0};
     ushort cmSelLowercase {0};
     ushort cmSelCapitalize {0};
+    ushort cmSelSortLines {0};
 };
 
 } // namespace turbo

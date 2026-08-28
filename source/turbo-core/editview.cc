@@ -211,6 +211,8 @@ void EditorView::updateCommands()
         setCmdState(cmds.cmSelLowercase, hasSelection);
     if (cmds.cmSelCapitalize)
         setCmdState(cmds.cmSelCapitalize, hasSelection);
+    if (cmds.cmSelSortLines)
+        setCmdState(cmds.cmSelSortLines, hasSelection);
 }
 
 } // namespace turbo

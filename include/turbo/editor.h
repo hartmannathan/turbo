@@ -107,6 +107,7 @@ public:
     inline void uppercase();
     inline void lowercase();
     inline void capitalize();
+    inline void sortLines();
     inline void toggleComment();
     inline void search(TStringView text, SearchDirection direction, SearchSettings settings);
     inline void replace(TStringView text, TStringView withText, ReplaceMethod method, SearchSettings settings);
@@ -142,6 +143,11 @@ inline void Editor::capitalize()
     turbo::changeCaseOfSelection(scintilla, caseConvCapitalize);
 }
 
+inline void Editor::sortLines()
+{
+    turbo::sortSelectedLines(scintilla);
+}
+
 inline void Editor::toggleComment()
 {
     turbo::toggleComment(scintilla, language);
@@ -175,7 +181,8 @@ class EditorView : public TSurfaceView
     // scrollbars...).
     //
     // It handles and enables the following commands:
-    // cmCut, cmCopy, cmPaste, cmSelUppercase, cmSelLowercase, cmSelCapitalize.
+    // cmCut, cmCopy, cmPaste, cmSelUppercase, cmSelLowercase, cmSelCapitalize,
+    // cmSelSortLines.
 public:
 
     Editor *editor {nullptr}; // Non-owning.

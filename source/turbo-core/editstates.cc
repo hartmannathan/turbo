@@ -4,6 +4,7 @@
 #include <turbo/editstates.h>
 #include <turbo/scintilla.h>
 #include <turbo/scintilla/internals.h>
+#include <numeric>
 
 namespace turbo {
 
@@ -420,7 +421,7 @@ static void insertComment(TScintilla &scintilla, const Language &language)
         insertLineComments(scintilla, language);
 }
 
-bool thereIsTextBeforeOrAfterSelection(TScintilla &scintilla)
+static bool thereIsTextBeforeOrAfterSelection(TScintilla &scintilla)
 {
     Sci::Position selStart = call(scintilla, SCI_GETSELECTIONSTART, 0U, 0U);
     Sci::Position selEnd = getSelectionEndSkippingEmptyLastLine(scintilla, selStart);
@@ -627,19 +628,106 @@ void stripTrailingSpaces(TScintilla &scintilla, const Language *language)
     }
 }
 
+static void appendNewline(TScintilla &scintilla)
+{
+    int eolType = call(scintilla, SCI_GETEOLMODE, 0U, 0U);
+    TStringView eol = (eolType == SC_EOL_CRLF) ? "\r\n" :
+                      (eolType == SC_EOL_CR)   ? "\r"   :
+                                                 "\n";
+    call(scintilla, SCI_APPENDTEXT, eol.size(), (sptr_t) eol.data());
+}
+
 void ensureNewlineAtEnd(TScintilla &scintilla)
 {
-    int EOLType = call(scintilla, SCI_GETEOLMODE, 0U, 0U);
     Sci::Line lineCount = call(scintilla, SCI_GETLINECOUNT, 0U, 0U);
     Sci::Position docEnd = call(scintilla, SCI_POSITIONFROMLINE, lineCount, 0U);
     if ( lineCount == 1 || (lineCount > 1 &&
          docEnd > call(scintilla, SCI_POSITIONFROMLINE, lineCount - 1, 0U)) )
+        appendNewline(scintilla);
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Sort selected lines
+
+static Sci::Position getLineStart(TScintilla &scintilla, Sci::Line line)
+{
+    return call(scintilla, SCI_POSITIONFROMLINE, line, 0U);
+}
+
+// View into a line's text, including the line break (if present).
+static TStringView getLineText(TScintilla &scintilla, Sci::Line line)
+{
+    return getRangePointer(
+        scintilla,
+        getLineStart(scintilla, line),
+        getLineStart(scintilla, line + 1)
+    );
+}
+
+// Length of a line's own trailing line break bytes.
+static size_t getNewlineLength(TScintilla &scintilla, Sci::Line line)
+{
+    Sci::Position lineEnd = call(scintilla, SCI_GETLINEENDPOSITION, line, 0U);
+    Sci::Position nextLineStart = getLineStart(scintilla, line + 1);
+    return (size_t) (nextLineStart - lineEnd);
+}
+
+void sortSelectedLines(TScintilla &scintilla)
+{
+    Sci::Position selStart = call(scintilla, SCI_GETSELECTIONSTART, 0U, 0U);
+    Sci::Position selEnd = getSelectionEndSkippingEmptyLastLine(scintilla, selStart);
+    Sci::Line firstLine = call(scintilla, SCI_LINEFROMPOSITION, selStart, 0U);
+    Sci::Line lastLine = call(scintilla, SCI_LINEFROMPOSITION, selEnd, 0U);
+    if (firstLine >= lastLine)
+        return;
+
+    Sci::Position caret = call(scintilla, SCI_GETCURRENTPOS, 0U, 0U);
+    Sci::Position anchor = call(scintilla, SCI_GETANCHOR, 0U, 0U);
+    bool caretAtEnd = (caret >= anchor);
+
+    Sci::Line n = lastLine - firstLine + 1;
+
+    call(scintilla, SCI_BEGINUNDOACTION, 0U, 0U);
+
+    // If the selection's last line has no line break of its own, give it one
+    // first to simplify the sorting. It will be trimmed back off afterwards.
+    bool noTrailingNewline = (getNewlineLength(scintilla, lastLine) == 0);
+    if (noTrailingNewline)
+        appendNewline(scintilla);
+
+    std::vector<Sci::Line> order(n);
+    std::iota(order.begin(), order.end(), firstLine);
+    std::sort(order.begin(), order.end(), [&] (Sci::Line a, Sci::Line b) {
+        return getLineText(scintilla, a) < getLineText(scintilla, b);
+    });
+
+    Sci::Position firstLineStart = getLineStart(scintilla, firstLine);
+    Sci::Position lastLineEnd = getLineStart(scintilla, firstLine + n);
+    size_t bufferSize = lastLineEnd - firstLineStart;
+
+    // Note: 'std::make_unique' would needlessly zero-initialize the entire array.
+    std::unique_ptr<char[]> bufferGuard(new char[bufferSize]);
+    char *buffer = bufferGuard.get();
+    char *p = buffer;
+    for (Sci::Line line : order)
     {
-        std::string_view EOL = (EOLType == SC_EOL_CRLF) ? "\r\n" :
-                               (EOLType == SC_EOL_CR)   ? "\r"   :
-                                                          "\n";
-        call(scintilla, SCI_APPENDTEXT, EOL.size(), (sptr_t) EOL.data());
+        TStringView s = getLineText(scintilla, line);
+        memcpy(p, s.data(), s.size());
+        p += s.size();
     }
+
+    size_t copySize = bufferSize;
+    if (noTrailingNewline)
+        copySize -= getNewlineLength(scintilla, order.back());
+
+    call(scintilla, SCI_SETTARGETRANGE, firstLineStart, lastLineEnd);
+    call(scintilla, SCI_REPLACETARGET, copySize, (sptr_t) buffer);
+    call(scintilla, SCI_ENDUNDOACTION, 0U, 0U);
+
+    Sci::Position newEnd = firstLineStart + (Sci::Position) copySize;
+    Sci::Position newAnchor = caretAtEnd ? firstLineStart : newEnd;
+    Sci::Position newCaret  = caretAtEnd ? newEnd : firstLineStart;
+    call(scintilla, SCI_SETSEL, newAnchor, newCaret);
 }
 
 } // namespace turbo
